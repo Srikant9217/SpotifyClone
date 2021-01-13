@@ -3,22 +3,29 @@ package com.example.spotifyclone.business.domain.state
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.spotifyclone.util.printLogD
-//import kotlinx.android.parcel.IgnoredOnParcel
 import java.lang.IndexOutOfBoundsException
-
-const val MESSAGE_STACK_BUNDLE_KEY = "com.example.spotifyclone.business.domain.state.MessageStack"
 
 class MessageStack: ArrayList<StateMessage>() {
 
-//    @IgnoredOnParcel
     private val _stateMessage: MutableLiveData<StateMessage?> = MutableLiveData()
 
-//    @IgnoredOnParcel
     val stateMessage: LiveData<StateMessage?>
         get() = _stateMessage
 
-    fun isStackEmpty(): Boolean{
-        return size == 0
+    private fun setStateMessage(stateMessage: StateMessage?){
+        _stateMessage.value = stateMessage
+    }
+
+    override fun add(element: StateMessage): Boolean {
+        if(this.contains(element)){ // prevent duplicate errors added to stack
+            return false
+        }
+        printLogD("MessageStack", "Adding State message")
+        val transaction = super.add(element)
+        if(this.size == 1){
+            setStateMessage(stateMessage = element)
+        }
+        return transaction
     }
 
     override fun addAll(elements: Collection<StateMessage>): Boolean {
@@ -28,20 +35,10 @@ class MessageStack: ArrayList<StateMessage>() {
         return true // always return true. We don't care about result bool.
     }
 
-    override fun add(element: StateMessage): Boolean {
-        if(this.contains(element)){ // prevent duplicate errors added to stack
-            return false
-        }
-        val transaction = super.add(element)
-        if(this.size == 1){
-            setStateMessage(stateMessage = element)
-        }
-        return transaction
-    }
-
     override fun removeAt(index: Int): StateMessage {
         try{
             val transaction = super.removeAt(index)
+            printLogD("MessageStack", "Removed State message at index $index")
             if(this.size > 0){
                 setStateMessage(stateMessage = this[0])
             }
@@ -63,7 +60,7 @@ class MessageStack: ArrayList<StateMessage>() {
         )
     }
 
-    private fun setStateMessage(stateMessage: StateMessage?){
-        _stateMessage.value = stateMessage
+    fun isStackEmpty(): Boolean{
+        return size == 0
     }
 }

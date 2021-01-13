@@ -2,6 +2,7 @@ package com.example.spotifyclone.business.domain.state
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.spotifyclone.util.printLogD
 
 /**
  * - Keeps track of active StateEvents in DataChannelManager
@@ -9,32 +10,38 @@ import androidx.lifecycle.MutableLiveData
  *      value in each StateEvent (shouldDisplayProgressBar)
  */
 class StateEventManager {
-    private val activeStateEvents: HashMap<String, StateEvent> = HashMap()
 
+    private val activeStateEvents: HashMap<String, StateEvent> = HashMap()
     private val _shouldDisplayProgressBar: MutableLiveData<Boolean> = MutableLiveData()
 
     val shouldDisplayProgressBar: LiveData<Boolean>
             get() = _shouldDisplayProgressBar
 
-    fun getActiveJobNames(): MutableSet<String>{
-        return activeStateEvents.keys
+
+    fun isStateEventActive(stateEvent: StateEvent): Boolean{
+        printLogD("StateEventManager", "is state event active? :" +
+                "${activeStateEvents.containsKey(stateEvent.eventName())}")
+        return activeStateEvents.containsKey(stateEvent.eventName())
     }
 
     fun addStateEvent(stateEvent: StateEvent){
+        printLogD("StateEventManager", "Adding state event : ${stateEvent.eventName()}")
         activeStateEvents[stateEvent.eventName()] = stateEvent
         syncNumActiveStateEvents()
     }
 
     fun removeStateEvent(stateEvent: StateEvent?){
+        printLogD("StateEventManager", "Removing state event : ${stateEvent?.eventName()}")
         activeStateEvents.remove(stateEvent?.eventName())
         syncNumActiveStateEvents()
     }
 
-    fun isStateEventActive(stateEvent: StateEvent): Boolean{
-        return activeStateEvents.containsKey(stateEvent.eventName())
+    fun getActiveStateEvents(): MutableSet<String>{
+        return activeStateEvents.keys
     }
 
-    fun clearActiveStateEventCounter(){
+    fun clearActiveStateEvents(){
+        printLogD("StateEventManager", "Clearing active state events")
         activeStateEvents.clear()
         syncNumActiveStateEvents()
     }
@@ -47,5 +54,6 @@ class StateEventManager {
             }
         }
         _shouldDisplayProgressBar.value = shouldDisplayProgressBar
+        printLogD("StateEventManager", "ProgressBar $shouldDisplayProgressBar ")
     }
 }

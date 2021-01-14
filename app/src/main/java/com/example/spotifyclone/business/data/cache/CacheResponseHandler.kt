@@ -1,6 +1,5 @@
 package com.example.spotifyclone.business.data.cache
 
-import com.example.spotifyclone.business.data.cache.CacheErrors.CACHE_DATA_NULL
 import com.example.spotifyclone.business.domain.state.*
 
 abstract class CacheResponseHandler <ViewState, Data>(
@@ -42,4 +41,8 @@ abstract class CacheResponseHandler <ViewState, Data>(
     }
 
     abstract suspend fun handleSuccess(resultObj: Data): DataState<ViewState>?
+
+    companion object{
+        const val CACHE_DATA_NULL = "Cache data is null"
+    }
 }

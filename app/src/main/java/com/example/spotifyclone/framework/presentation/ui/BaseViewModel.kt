@@ -3,7 +3,6 @@ package com.example.spotifyclone.framework.presentation.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.spotifyclone.business.data.util.GenericErrors
 import com.example.spotifyclone.business.domain.state.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -60,7 +59,7 @@ abstract class BaseViewModel<ViewState> : ViewModel() {
         emit(
             DataState.error<ViewState>(
                 response = Response(
-                    message = GenericErrors.INVALID_STATE_EVENT,
+                    message = INVALID_STATE_EVENT,
                     uiComponentType = UIComponentType.None,
                     messageType = MessageType.Error
                 ),
@@ -93,4 +92,9 @@ abstract class BaseViewModel<ViewState> : ViewModel() {
     fun setupChannel() = dataChannelManager.setupChannel()
 
     fun cancelActiveJobs() = dataChannelManager.cancelActiveJobs()
+
+
+    companion object{
+        const val INVALID_STATE_EVENT = "Invalid state event"
+    }
 }

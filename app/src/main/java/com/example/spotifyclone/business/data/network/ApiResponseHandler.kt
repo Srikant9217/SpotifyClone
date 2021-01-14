@@ -1,8 +1,7 @@
 package com.example.spotifyclone.business.data.network
 
-import com.example.spotifyclone.business.data.network.NetworkErrors.NETWORK_DATA_NULL
-import com.example.spotifyclone.business.data.network.NetworkErrors.NETWORK_ERROR
 import com.example.spotifyclone.business.domain.state.*
+import com.example.spotifyclone.util.printLogD
 
 abstract class ApiResponseHandler <ViewState, Data>(
     private val response: ApiResult<Data?>,
@@ -14,6 +13,7 @@ abstract class ApiResponseHandler <ViewState, Data>(
         return when(response){
 
             is ApiResult.GenericError -> {
+                printLogD("ApiResponseHandler", "Code : ${response.code}")
                 DataState.error(
                     response = Response(
                         message = "${stateEvent?.errorInfo()}\n\nReason: ${response.errorMessage.toString()}",
@@ -56,4 +56,8 @@ abstract class ApiResponseHandler <ViewState, Data>(
 
     abstract suspend fun handleSuccess(resultObj: Data): DataState<ViewState>?
 
+    companion object{
+        const val NETWORK_ERROR = "Network error"
+        const val NETWORK_DATA_NULL = "Network data is null"
+    }
 }

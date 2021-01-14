@@ -16,8 +16,7 @@ import javax.inject.Inject
 class SearchTracks
 @Inject
 constructor(
-    private val trackService: TrackService,
-    private val trackNetworkDataSource: TrackNetworkDataSource
+    private val trackService: TrackService
 ) {
     fun searchTrackById(
         id: String,

@@ -15,41 +15,47 @@ class StateEventManager {
     private val _shouldDisplayProgressBar: MutableLiveData<Boolean> = MutableLiveData()
 
     val shouldDisplayProgressBar: LiveData<Boolean>
-            get() = _shouldDisplayProgressBar
+        get() = _shouldDisplayProgressBar
 
 
-    fun isStateEventActive(stateEvent: StateEvent): Boolean{
-        printLogD("StateEventManager", "is state event active? :" +
-                "${activeStateEvents.containsKey(stateEvent.eventName())}")
+    fun isStateEventActive(stateEvent: StateEvent): Boolean {
+        printLogD(
+            "StateEventManager", "is state event active? :" +
+                    "${activeStateEvents.containsKey(stateEvent.eventName())}"
+        )
         return activeStateEvents.containsKey(stateEvent.eventName())
     }
 
-    fun addStateEvent(stateEvent: StateEvent){
-        printLogD("StateEventManager", "Adding state event : ${stateEvent.eventName()}")
+    fun addStateEvent(stateEvent: StateEvent) {
+        printLogD(
+            "StateEventManager",
+            "-------------------------------- \n" +
+                    "launching New State Event: ${stateEvent.eventName()}"
+        )
         activeStateEvents[stateEvent.eventName()] = stateEvent
         syncNumActiveStateEvents()
     }
 
-    fun removeStateEvent(stateEvent: StateEvent?){
+    fun removeStateEvent(stateEvent: StateEvent?) {
         printLogD("StateEventManager", "Removing state event : ${stateEvent?.eventName()}")
         activeStateEvents.remove(stateEvent?.eventName())
         syncNumActiveStateEvents()
     }
 
-    fun getActiveStateEvents(): MutableSet<String>{
+    fun getActiveStateEvents(): MutableSet<String> {
         return activeStateEvents.keys
     }
 
-    fun clearActiveStateEvents(){
+    fun clearActiveStateEvents() {
         printLogD("StateEventManager", "Clearing active state events")
         activeStateEvents.clear()
         syncNumActiveStateEvents()
     }
 
-    private fun syncNumActiveStateEvents(){
+    private fun syncNumActiveStateEvents() {
         var shouldDisplayProgressBar = false
-        for(stateEvent in activeStateEvents.values){
-            if(stateEvent.shouldDisplayProgressBar()){
+        for (stateEvent in activeStateEvents.values) {
+            if (stateEvent.shouldDisplayProgressBar()) {
                 shouldDisplayProgressBar = true
             }
         }

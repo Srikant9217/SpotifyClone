@@ -14,3 +14,8 @@ fun printLogD(className: String?, message: String ) {
         println("$className: $message")
     }
 }
+
+object Constants {
+    const val TAG = "DEBUG"
+    const val DEBUG = true
+}

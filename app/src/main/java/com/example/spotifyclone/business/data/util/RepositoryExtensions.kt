@@ -1,15 +1,19 @@
 package com.example.spotifyclone.business.data.util
 
-import com.example.spotifyclone.business.data.cache.CacheConstants.CACHE_TIMEOUT
-import com.example.spotifyclone.business.data.cache.CacheErrors.CACHE_ERROR_TIMEOUT
-import com.example.spotifyclone.business.data.cache.CacheErrors.CACHE_ERROR_UNKNOWN
 import com.example.spotifyclone.business.data.cache.CacheResult
 import com.example.spotifyclone.business.data.network.ApiResult
-import com.example.spotifyclone.business.data.network.NetworkConstants.NETWORK_TIMEOUT
-import com.example.spotifyclone.business.data.network.NetworkErrors.NETWORK_ERROR_TIMEOUT
-import com.example.spotifyclone.business.data.network.NetworkErrors.NETWORK_ERROR_UNKNOWN
-import com.example.spotifyclone.business.data.util.GenericErrors.ERROR_UNKNOWN
-import kotlinx.coroutines.*
+import com.example.spotifyclone.business.data.util.ERRORS.CACHE_ERROR_TIMEOUT
+import com.example.spotifyclone.business.data.util.ERRORS.CACHE_ERROR_UNKNOWN
+import com.example.spotifyclone.business.data.util.ERRORS.ERROR_UNKNOWN
+import com.example.spotifyclone.business.data.util.ERRORS.NETWORK_ERROR_TIMEOUT
+import com.example.spotifyclone.business.data.util.ERRORS.NETWORK_ERROR_UNKNOWN
+import com.example.spotifyclone.business.data.util.TIMEOUTS.CACHE_TIMEOUT
+import com.example.spotifyclone.business.data.util.TIMEOUTS.NETWORK_TIMEOUT
+import com.example.spotifyclone.util.printLogD
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -20,9 +24,11 @@ suspend fun <T> safeApiCall(
     return withContext(dispatcher) {
         try {
             withTimeout(NETWORK_TIMEOUT) {
+                printLogD("safeApiCall", "Executing Network Request")
                 ApiResult.Success(apiCall.invoke())
             }
         } catch (throwable: Throwable) {
+            printLogD("safeApiCall", "Error in executing Network Request")
             throwable.printStackTrace()
             when (throwable) {
                 is TimeoutCancellationException -> {
@@ -58,12 +64,13 @@ suspend fun <T> safeCacheCall(
     return withContext(dispatcher) {
         try {
             withTimeout(CACHE_TIMEOUT) {
+                printLogD("safeApiCall", "Executing Cache Request")
                 CacheResult.Success(cacheCall.invoke())
             }
         } catch (throwable: Throwable) {
+            printLogD("safeApiCall", "Error in executing Cache Request")
             throwable.printStackTrace()
             when (throwable) {
-
                 is TimeoutCancellationException -> {
                     CacheResult.GenericError(CACHE_ERROR_TIMEOUT)
                 }
@@ -81,4 +88,19 @@ private fun convertErrorBody(throwable: HttpException): String? {
     } catch (exception: Exception) {
         ERROR_UNKNOWN
     }
+}
+
+object TIMEOUTS {
+    const val NETWORK_TIMEOUT = 6000L
+    const val CACHE_TIMEOUT = 2000L
+}
+
+object ERRORS {
+    const val NETWORK_ERROR_TIMEOUT = "Network timeout"
+    const val NETWORK_ERROR_UNKNOWN = "Unknown network error"
+
+    const val CACHE_ERROR_TIMEOUT = "Cache timeout"
+    const val CACHE_ERROR_UNKNOWN = "Unknown cache error"
+
+    const val ERROR_UNKNOWN = "Unknown error"
 }

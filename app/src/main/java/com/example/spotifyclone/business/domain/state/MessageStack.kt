@@ -20,19 +20,17 @@ class MessageStack : ArrayList<StateMessage>() {
         if (this.contains(element)) { // prevent duplicate errors added to stack
             return false
         }
-        printLogD(
-            "MessageStack",
-            "------------------------------------- \n" +
-                    "Adding New State message \n" +
-                    "message : ${element.response.message} \n" +
-                    "type : ${element.response.messageType} \n" +
-                    "uiType : ${element.response.uiComponentType} \n" +
-                    "-------------------------------------"
-        )
         val transaction = super.add(element)
         if (this.size == 1) {
             setStateMessage(stateMessage = element)
         }
+        printLogD(
+            "MessageStack",
+            "Adding New StateMessage \n" +
+                    "Message : ${element.response.message} \n" +
+                    "UiComponentType : ${element.response.uiComponentType} \n" +
+                    "MessageType : ${element.response.messageType}"
+        )
         return transaction
     }
 
@@ -68,6 +66,7 @@ class MessageStack : ArrayList<StateMessage>() {
     }
 
     fun isStackEmpty(): Boolean {
+        printLogD("MessageStack", "Is StateMessage Empty? : ${size == 0}")
         return size == 0
     }
 }

@@ -1,4 +1,4 @@
-package com.example.spotifyclone.framework.presentation.ui.home
+package com.example.spotifyclone.framework.presentation.ui.main.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,8 +11,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -20,17 +18,17 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import com.example.spotifyclone.business.domain.model.track.TrackObject
+import com.example.spotifyclone.business.domain.state.StateMessageCallback
 import com.example.spotifyclone.framework.presentation.theme.SpotifyCloneTheme
-import com.example.spotifyclone.framework.presentation.ui.home.state.HomeStateEvent.SearchTrackEvent
+import com.example.spotifyclone.framework.presentation.ui.main.BaseFragment
+import com.example.spotifyclone.framework.presentation.ui.main.home.state.HomeStateEvent.SearchTrackEvent
 import com.example.spotifyclone.util.printLogD
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
 
     private val viewModel: HomeViewModel by activityViewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,8 +70,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun subscribeObservers() {
-        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            if (viewState != null) {
+        viewModel.viewState.observe(viewLifecycleOwner, Observer { ViewState ->
+            ViewState?.let { viewState ->
                 viewState.track?.let { currentTrack ->
                     printLogD("subscribeObservers", "track url : ${currentTrack.uri}")
                 }
@@ -84,10 +82,16 @@ class HomeFragment : Fragment() {
             viewModel.displayProgressBar.value = display
         })
 
-        viewModel.stateMessage.observe(viewLifecycleOwner, Observer { stateMessage ->
-            stateMessage?.response?.let { response ->
-                printLogD("subscribeObservers", "State message : ${response.message.toString()}")
-                viewModel.removeStateMessage()
+        viewModel.stateMessage.observe(viewLifecycleOwner, Observer { StateMessage ->
+            StateMessage?.let { stateMessage ->
+                uiCommunicationListener.onResponseReceived(
+                    response = stateMessage.response,
+                    stateMessageCallback = object : StateMessageCallback {
+                        override fun removeMessageFromStack() {
+                            viewModel.removeStateMessage()
+                        }
+                    }
+                )
             }
         })
     }

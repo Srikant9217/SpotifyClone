@@ -1,13 +1,11 @@
 package com.example.spotifyclone.business.interactors.home
 
 import com.example.spotifyclone.business.data.network.ApiResponseHandler
-import com.example.spotifyclone.business.data.network.abstraction.TrackNetworkDataSource
 import com.example.spotifyclone.business.data.util.safeApiCall
 import com.example.spotifyclone.business.domain.model.track.TrackObject
 import com.example.spotifyclone.business.domain.state.*
 import com.example.spotifyclone.framework.datasource.network.abstraction.TrackService
-import com.example.spotifyclone.framework.datasource.preferances.MyPreferences
-import com.example.spotifyclone.framework.presentation.ui.home.state.HomeViewState
+import com.example.spotifyclone.framework.presentation.ui.main.home.state.HomeViewState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

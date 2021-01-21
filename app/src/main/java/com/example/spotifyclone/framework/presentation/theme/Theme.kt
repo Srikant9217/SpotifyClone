@@ -10,25 +10,13 @@ private val DarkColorPalette = darkColors(
     primaryVariant = green700,
     secondary = teal200,
     background = Color.Black,
-    surface = Color.Black,
+    surface = Color.DarkGray,
     onPrimary = Color.Black,
     onSecondary = Color.White,
     onBackground = Color.White,
     onSurface = Color.White,
     error = Color.Red,
 )
-
-//private val LightColorPalette = lightColors(
-//    primary = green500,
-//    primaryVariant = green700,
-//    secondary = teal200,
-//    background = Color.White,
-//    surface = Color.White,
-//    onPrimary = Color.White,
-//    onSecondary = Color.Black,
-//    onBackground = Color.Black,
-//    onSurface = Color.Black
-//)
 
 @Composable
 fun SpotifyCloneTheme(

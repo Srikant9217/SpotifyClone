@@ -14,13 +14,17 @@ class MyPreferences
 ) {
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    fun saveToken(token: String) {
+    fun saveSpotifyToken(token: String?) {
         val editor = prefs.edit()
-        editor.putString("token", token)
+        editor.putString(SPOTIFY_TOKEN, token)
         editor.apply()
     }
 
-    fun getToken(): String? {
-        return prefs.getString("token", null)
+    fun getSpotifyToken(): String? {
+        return prefs.getString(SPOTIFY_TOKEN, null)
+    }
+
+    companion object {
+        const val SPOTIFY_TOKEN = "SPOTIFY_TOKEN"
     }
 }

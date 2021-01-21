@@ -16,7 +16,7 @@ constructor(
             .request()
             .newBuilder()
 
-        preferences.getToken()?.let { token->
+        preferences.getSpotifyToken()?.let { token->
             requestBuilder.addHeader("Authorization", "Bearer $token")
         }
 

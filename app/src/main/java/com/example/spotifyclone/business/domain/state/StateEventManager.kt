@@ -20,7 +20,7 @@ class StateEventManager {
 
     fun isStateEventActive(stateEvent: StateEvent): Boolean {
         printLogD(
-            "StateEventManager", "is state event active? :" +
+            "StateEventManager", "Is StateEvent Active? : " +
                     "${activeStateEvents.containsKey(stateEvent.eventName())}"
         )
         return activeStateEvents.containsKey(stateEvent.eventName())
@@ -29,15 +29,14 @@ class StateEventManager {
     fun addStateEvent(stateEvent: StateEvent) {
         printLogD(
             "StateEventManager",
-            "-------------------------------- \n" +
-                    "launching New State Event: ${stateEvent.eventName()}"
+            "------------------ Launching New StateEvent : ${stateEvent.eventName()}"
         )
         activeStateEvents[stateEvent.eventName()] = stateEvent
         syncNumActiveStateEvents()
     }
 
     fun removeStateEvent(stateEvent: StateEvent?) {
-        printLogD("StateEventManager", "Removing state event : ${stateEvent?.eventName()}")
+        printLogD("StateEventManager", "Removed StateEvent : ${stateEvent?.eventName()}")
         activeStateEvents.remove(stateEvent?.eventName())
         syncNumActiveStateEvents()
     }

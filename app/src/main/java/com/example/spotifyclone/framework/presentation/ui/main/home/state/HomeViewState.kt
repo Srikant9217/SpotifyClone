@@ -1,4 +1,4 @@
-package com.example.spotifyclone.framework.presentation.ui.home.state
+package com.example.spotifyclone.framework.presentation.ui.main.home.state
 
 import com.example.spotifyclone.business.domain.model.track.TrackObject
 

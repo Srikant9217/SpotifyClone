@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Spotify Clone</string>
+
+    <string name="facebook_application_id" translatable="false">4206165826084637</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb4206165826084637</string>
+
 </resources>

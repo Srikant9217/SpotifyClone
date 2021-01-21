@@ -19,7 +19,12 @@ abstract class DataChannelManager<ViewState> {
         stateEvent: StateEvent,
         jobFunction: Flow<DataState<ViewState>?>
     ) {
-        if (canExecuteNewStateEvent(stateEvent)) {
+        val canExecute = canExecuteNewStateEvent(stateEvent)
+        printLogD(
+            "DataChannelManager",
+            "Can Execute New StateEvent : $canExecute"
+        )
+        if (canExecute) {
             addStateEvent(stateEvent)
             jobFunction
                 .onEach { dataState ->

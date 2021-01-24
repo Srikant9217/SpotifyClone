@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SpotifyClone">
         <activity
-            android:name=".framework.presentation.ui.TestActivity"
+            android:name=".framework.presentation.ui.auth.AuthActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>

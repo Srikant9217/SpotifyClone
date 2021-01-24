@@ -7,7 +7,7 @@ data class AuthViewState(
     //false -> triggered, but not completed
     //true -> completed
     data class Event(
-        var checkSpotifyPackage: Boolean? = null,
+        var checkSpotifyPackage: Boolean? = false,
         var startFirebaseAuthentication: Boolean? = null,
         var getSpotifyToken: Boolean? = null
     )

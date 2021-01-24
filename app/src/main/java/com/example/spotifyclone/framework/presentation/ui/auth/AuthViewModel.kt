@@ -18,14 +18,14 @@ class AuthViewModel : BaseViewModel<AuthViewState>() {
     val spotifyTokenDialog = mutableStateOf(false)
     val spotifyTokenErrorMessage = mutableStateOf("")
 
-    fun setFirebaseErrorDialog(bool: Boolean, message: String) {
-        firebaseErrorDialog.value = bool
+    fun showFirebaseErrorDialog(message: String) {
         firebaseErrorMessage.value = message
+        firebaseErrorDialog.value = true
     }
 
-    fun setSpotifyTokenErrorDialog(bool: Boolean, message: String) {
-        spotifyTokenDialog.value = bool
+    fun showSpotifyTokenErrorDialog(message: String) {
         spotifyTokenErrorMessage.value = message
+        spotifyTokenDialog.value = true
     }
 
 

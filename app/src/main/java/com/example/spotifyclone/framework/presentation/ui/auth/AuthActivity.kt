@@ -8,6 +8,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.Observer
+import com.example.spotifyclone.R
 import com.example.spotifyclone.business.domain.state.StateMessageCallback
 import com.example.spotifyclone.framework.presentation.components.FirebaseErrorDialog
 import com.example.spotifyclone.framework.presentation.components.SplashLogo
@@ -61,42 +62,25 @@ class AuthActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_auth)
         subscribeObservers()
         setContent {
             SpotifyCloneTheme {
 
                 SplashLogo(isDisplayed = viewModel.splashLogo.value)
 
-                SpotifyNotInstalledDialog(
-                    isDisplayed = viewModel.spotifyNotInstalledDialog.value,
-                    showDialog = { viewModel.spotifyNotInstalledDialog.value = it },
-                    downloadSpotify = { downloadSpotify() },
-                    closeApp = { this.finish() })
 
-                FirebaseErrorDialog(
-                    isDisplayed = viewModel.firebaseErrorDialog.value,
-                    text = viewModel.firebaseErrorMessage.value,
-                    showDialog = { viewModel.setFirebaseErrorDialog(it, "") },
-                    closeApp = { this.finish() })
 
-                SpotifyTokenErrorDialog(
-                    isDisplayed = viewModel.spotifyTokenDialog.value,
-                    text = viewModel.spotifyTokenErrorMessage.value,
-                    showDialog = { viewModel.setSpotifyTokenErrorDialog(it, "") },
-                    closeApp = { this.finish() })
+
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.setStateEvent(CheckSpotifyPackage)
     }
 
     private fun subscribeObservers() {
         viewModel.viewState.observe(this, Observer { ViewState ->
             ViewState?.let { viewState ->
 
+                //Event will be triggered if value is false
                 viewState.event.checkSpotifyPackage?.let { event ->
                     if (!event) {
                         checkSpotifyPackage()
@@ -117,23 +101,7 @@ class AuthActivity : BaseActivity() {
             }
         })
 
-        viewModel.shouldDisplayProgressBar.observe(this, Observer { boolean ->
-            displayProgressBar(boolean)
-        })
-
-        viewModel.stateMessage.observe(this, Observer { StateMessage ->
-            StateMessage?.let { stateMessage ->
-                onResponseReceived(
-                    response = stateMessage.response,
-                    stateMessageCallback = object : StateMessageCallback {
-                        override fun removeMessageFromStack() {
-                            viewModel.removeStateMessage()
-                        }
-                    }
-                )
-            }
-        })
-
+        //if spotify is installed and user and token not null...proceed to mainActivity
         sessionManager.spotifyApp.value?.let { spotifyApp ->
             sessionManager.firebaseUser.value?.let {
                 sessionManager.spotifyToken.value?.let {
@@ -184,19 +152,24 @@ class AuthActivity : BaseActivity() {
     private fun startFirebaseAuthentication() {
         val currentUser = Firebase.auth.currentUser
         if (currentUser == null) {
+            printLogD("startFirebaseAuthentication", "User is null")
             val providers = arrayListOf(
-                AuthUI.IdpConfig.EmailBuilder().build(),
                 AuthUI.IdpConfig.GoogleBuilder().build(),
-                AuthUI.IdpConfig.AnonymousBuilder().build()
+                AuthUI.IdpConfig.PhoneBuilder().build(),
+                AuthUI.IdpConfig.EmailBuilder().build(),
+                AuthUI.IdpConfig.FacebookBuilder().build()
             )
             startActivityForResult(
                 AuthUI.getInstance()
                     .createSignInIntentBuilder()
                     .setAvailableProviders(providers)
+                    .setLogo(R.mipmap.ic_launcher_round)
+                    .setTheme(R.style.Theme_SpotifyClone)
                     .build(),
-                FIREBASE_AUTHENTICATION_CODE
+                AuthActivity.FIREBASE_AUTHENTICATION_CODE
             )
         } else {
+            printLogD("startFirebaseAuthentication", "User not null")
             sessionManager.setFirebaseUser(currentUser)
             viewModel.finishFirebaseAuthentication(true)
             viewModel.setStateEvent(GetSpotifyToken)
@@ -204,17 +177,26 @@ class AuthActivity : BaseActivity() {
     }
 
     private fun getSpotifyToken() {
-        val request = AuthorizationRequest
-            .Builder(
-                CLIENT_ID,
-                AuthorizationResponse.Type.TOKEN,
-                REDIRECT_URI
-            )
-            .setShowDialog(false)
-            .setCampaign("your-campaign-token")
-            .build()
+        if (sessionManager.spotifyToken.value == null) {
 
-        AuthorizationClient.openLoginActivity(this, SPOTIFY_TOKEN_REQUEST_CODE, request)
+            val request = AuthorizationRequest
+                .Builder(
+                    CLIENT_ID,
+                    AuthorizationResponse.Type.TOKEN,
+                    REDIRECT_URI
+                )
+                .setShowDialog(false)
+                .setCampaign("your-campaign-token")
+                .build()
+
+            AuthorizationClient.openLoginActivity(
+                this,
+                SPOTIFY_TOKEN_REQUEST_CODE,
+                request)
+
+        } else {
+            printLogD("getSpotifyToken", "token not null")
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -223,26 +205,58 @@ class AuthActivity : BaseActivity() {
         if (requestCode == FIREBASE_AUTHENTICATION_CODE) {
             val response = IdpResponse.fromResultIntent(data)
             if (resultCode == RESULT_OK) {
+                printLogD("onActivityResult", "Login Successful")
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 sessionManager.setFirebaseUser(currentUser)
                 viewModel.finishFirebaseAuthentication(true)
                 viewModel.setStateEvent(GetSpotifyToken)
             } else {
-                response?.error?.message?.let { message ->
-                    viewModel.splashLogo.value = false
-                    viewModel.setFirebaseErrorDialog(true, message)
+                if (response == null) {
+                    printLogD("onActivityResult", "User cancelled auth flow")
+                } else {
+                    response.error?.let { error ->
+                        viewModel.splashLogo.value = false
+                        viewModel.showFirebaseErrorDialog(error.errorCode.toString())
+                        printLogD(
+                            "onActivityResult",
+                            "\n Error code : ${error.errorCode}" +
+                                    "\n Error message : ${error.message}" +
+                                    "\n Error cause : ${error.cause}" +
+                                    "\n Error localizedMessage : ${error.localizedMessage}" +
+                                    "\n Error stackTrace : ${error.stackTrace}"
+                        )
+                    }
                 }
             }
         } else if (requestCode == SPOTIFY_TOKEN_REQUEST_CODE) {
             val response = AuthorizationClient.getResponse(resultCode, data)
-            if (response.error != null && response.error.isNotEmpty()) {
-                viewModel.setSpotifyTokenErrorDialog(true, response.error)
-                printLogD("onActivityResult", response.error)
-            }
-            response.accessToken?.let { token ->
-                sessionManager.setSpotifyToken(token)
-                viewModel.finishSpotifyTokenEvent(true)
-                printLogD("onActivityResult", token)
+
+            when (response.type) {
+                AuthorizationResponse.Type.TOKEN -> {
+                    sessionManager.setSpotifyToken(response.accessToken)
+                    viewModel.finishSpotifyTokenEvent(true)
+                    printLogD("onActivityResult", "Token : ${response.accessToken}")
+                }
+                AuthorizationResponse.Type.CODE -> {
+                    printLogD("onActivityResult", "CODE : ${response.code}")
+                    viewModel.showSpotifyTokenErrorDialog(response.code)
+                }
+                AuthorizationResponse.Type.ERROR -> {
+                    printLogD("onActivityResult", "ERROR : ${response.error}")
+                    viewModel.showSpotifyTokenErrorDialog(response.error)
+                }
+                AuthorizationResponse.Type.UNKNOWN -> {
+                    printLogD("onActivityResult", "UNKNOWN ERROR")
+                    viewModel.showSpotifyTokenErrorDialog("unknown Error")
+                }
+                AuthorizationResponse.Type.EMPTY -> {
+                    printLogD("onActivityResult", "EMPTY RESPONSE")
+                    viewModel.showSpotifyTokenErrorDialog("empty")
+                }
+                else -> {
+                    printLogD("onActivityResult", "else UNKNOWN ERROR")
+                    viewModel.showSpotifyTokenErrorDialog("else nothing")
+                }
             }
         }
     }
@@ -250,9 +264,22 @@ class AuthActivity : BaseActivity() {
     private fun firebaseSignOut() {
         AuthUI.getInstance()
             .signOut(this)
-            .addOnCompleteListener {
-                TODO()
+            .addOnSuccessListener {
+                printLogD("firebaseSignOut", "Signed Out")
             }
+            .addOnFailureListener { error ->
+                printLogD(
+                    "firebaseSignOut",
+                    "\n Error message : ${error.message}" +
+                            "\n Error cause : ${error.cause}" +
+                            "\n Error localizedMessage : ${error.localizedMessage}" +
+                            "\n Error stackTrace : ${error.stackTrace}"
+                )
+            }
+    }
+
+    private fun clearSpotifyToken() {
+        sessionManager.setSpotifyToken(null)
     }
 
     private fun navMainActivity() {

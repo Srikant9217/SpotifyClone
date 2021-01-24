@@ -13,9 +13,9 @@ class MyPreferences
     @ApplicationContext context: Context
 ) {
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val editor = prefs.edit()
 
     fun saveSpotifyToken(token: String?) {
-        val editor = prefs.edit()
         editor.putString(SPOTIFY_TOKEN, token)
         editor.apply()
     }

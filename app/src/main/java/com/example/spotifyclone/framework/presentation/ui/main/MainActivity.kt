@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.lifecycle.Observer
+import com.example.spotifyclone.R
 import com.example.spotifyclone.framework.presentation.ui.BaseActivity
 import com.example.spotifyclone.framework.presentation.ui.auth.AuthActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +24,7 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
+        setContentView(R.layout.activity_main)
         restoreSession(savedInstanceState)
         subscribeObservers()
     }

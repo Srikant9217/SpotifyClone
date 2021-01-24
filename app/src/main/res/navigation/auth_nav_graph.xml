@@ -2,10 +2,43 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/auth_nav_graph"
-    app:startDestination="@id/authFragment">
-
+    app:startDestination="@id/launcherFragment">
     <fragment
-        android:id="@+id/authFragment"
+        android:id="@+id/launcherFragment"
         android:name="com.example.spotifyclone.framework.presentation.ui.auth.LauncherFragment"
-        android:label="AuthFragment" />
+        android:label="LauncherFragment" >
+        <action
+            android:id="@+id/action_launcherFragment_to_spotifyInstallFragment"
+            app:destination="@id/spotifyInstallFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/spotifyInstallFragment"
+        android:name="com.example.spotifyclone.framework.presentation.ui.auth.SpotifyInstallFragment"
+        android:label="SpotifyInstallFragment" >
+        <action
+            android:id="@+id/action_spotifyInstallFragment_to_firebaseAuthFragment"
+            app:destination="@id/firebaseAuthFragment" />
+        <action
+            android:id="@+id/action_spotifyInstallFragment_to_launcherFragment"
+            app:destination="@id/launcherFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/firebaseAuthFragment"
+        android:name="com.example.spotifyclone.framework.presentation.ui.auth.FirebaseAuthFragment"
+        android:label="FirebaseAuthFragment" >
+        <action
+            android:id="@+id/action_firebaseAuthFragment_to_spotifyTokenFragment"
+            app:destination="@id/spotifyTokenFragment" />
+        <action
+            android:id="@+id/action_firebaseAuthFragment_to_launcherFragment"
+            app:destination="@id/launcherFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/spotifyTokenFragment"
+        android:name="com.example.spotifyclone.framework.presentation.ui.auth.SpotifyTokenFragment"
+        android:label="SpotifyTokenFragment" >
+        <action
+            android:id="@+id/action_spotifyTokenFragment_to_launcherFragment"
+            app:destination="@id/launcherFragment" />
+    </fragment>
 </navigation>

@@ -11,7 +11,7 @@ fun SpotifyNotInstalledDialog(
     isDisplayed: Boolean,
     showDialog: (Boolean) -> Unit,
     downloadSpotify: () -> Unit,
-    closeApp: () -> Unit
+    retry: () -> Unit
 ) {
     MyDialog(
         isDisplayed = isDisplayed,
@@ -26,7 +26,7 @@ fun SpotifyNotInstalledDialog(
             }
         },
         onDismissRequest = { },
-        closeApp = { closeApp() })
+        retry = { retry() })
 }
 
 @Composable
@@ -34,7 +34,7 @@ fun FirebaseErrorDialog(
     isDisplayed: Boolean,
     text: String,
     showDialog: (Boolean) -> Unit,
-    closeApp: () -> Unit
+    retry: () -> Unit
 ) {
     MyDialog(
         isDisplayed = isDisplayed,
@@ -48,8 +48,8 @@ fun FirebaseErrorDialog(
                 Text(text = "Retry")
             }
         },
-        onDismissRequest = { closeApp() },
-        closeApp = { closeApp() })
+        onDismissRequest = { retry() },
+        retry = { retry() })
 }
 
 @Composable
@@ -57,17 +57,22 @@ fun SpotifyTokenErrorDialog(
     isDisplayed: Boolean,
     text: String,
     showDialog: (Boolean) -> Unit,
-    closeApp: () -> Unit
+    retry: () -> Unit
 ) {
     MyDialog(
         isDisplayed = isDisplayed,
         title = "Error",
         text = text,
         confirmButton = {
-
+            Button(onClick = {
+                showDialog(false)
+                printLogD("SpotifyTokenErrorDialog", "Retry")
+            }) {
+                Text(text = "Retry")
+            }
         },
-        onDismissRequest = { closeApp() },
-        closeApp = { closeApp() })
+        onDismissRequest = { retry() },
+        retry = { retry() })
 }
 
 @Composable
@@ -77,7 +82,7 @@ fun MyDialog(
     text: String,
     confirmButton: @Composable () -> Unit,
     onDismissRequest: () -> Unit,
-    closeApp: () -> Unit
+    retry: () -> Unit
 ) {
     if (isDisplayed) {
         AlertDialog(
@@ -85,7 +90,7 @@ fun MyDialog(
             text = { Text(text = text) },
             confirmButton = { confirmButton() },
             dismissButton = {
-                Button(onClick = { closeApp() }) {
+                Button(onClick = { retry() }) {
                     Text(text = "Dismiss")
                 }
             },

@@ -1,5 +1,7 @@
 package com.example.spotifyclone.business.domain.state
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.spotifyclone.util.printLogD
@@ -7,13 +9,10 @@ import java.lang.IndexOutOfBoundsException
 
 class MessageStack : ArrayList<StateMessage>() {
 
-    private val _stateMessage: MutableLiveData<StateMessage?> = MutableLiveData()
+    val stateMessage: MutableState<StateMessage?> = mutableStateOf(null)
 
-    val stateMessage: LiveData<StateMessage?>
-        get() = _stateMessage
-
-    private fun setStateMessage(stateMessage: StateMessage?) {
-        _stateMessage.value = stateMessage
+    private fun setStateMessage(message: StateMessage?) {
+        stateMessage.value = message
     }
 
     override fun add(element: StateMessage): Boolean {
@@ -22,7 +21,7 @@ class MessageStack : ArrayList<StateMessage>() {
         }
         val transaction = super.add(element)
         if (this.size == 1) {
-            setStateMessage(stateMessage = element)
+            setStateMessage(message = element)
         }
         printLogD(
             "MessageStack",
@@ -46,7 +45,7 @@ class MessageStack : ArrayList<StateMessage>() {
             val transaction = super.removeAt(index)
             printLogD("MessageStack", "Removed State message at index $index")
             if (this.size > 0) {
-                setStateMessage(stateMessage = this[0])
+                setStateMessage(message = this[0])
             } else {
                 printLogD("MessageStack", "Message stack is empty")
                 setStateMessage(null)

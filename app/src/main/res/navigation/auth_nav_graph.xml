@@ -3,42 +3,95 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/auth_nav_graph"
     app:startDestination="@id/launcherFragment">
+
     <fragment
         android:id="@+id/launcherFragment"
         android:name="com.example.spotifyclone.framework.presentation.ui.auth.LauncherFragment"
-        android:label="LauncherFragment" >
+        android:label="LauncherFragment">
         <action
             android:id="@+id/action_launcherFragment_to_spotifyInstallFragment"
-            app:destination="@id/spotifyInstallFragment" />
+            app:destination="@id/spotifyInstallFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_launcherFragment_to_firebaseAuthFragment"
+            app:destination="@id/firebaseAuthFragment" />
+        <action
+            android:id="@+id/action_launcherFragment_to_spotifyTokenFragment"
+            app:destination="@id/spotifyTokenFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/spotifyInstallFragment"
         android:name="com.example.spotifyclone.framework.presentation.ui.auth.SpotifyInstallFragment"
-        android:label="SpotifyInstallFragment" >
+        android:label="SpotifyInstallFragment">
         <action
             android:id="@+id/action_spotifyInstallFragment_to_firebaseAuthFragment"
-            app:destination="@id/firebaseAuthFragment" />
+            app:destination="@id/firebaseAuthFragment"
+            app:popUpTo="@id/spotifyInstallFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_spotifyInstallFragment_to_spotifyTokenFragment"
+            app:destination="@id/spotifyTokenFragment"
+            app:popUpTo="@id/spotifyInstallFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_spotifyInstallFragment_to_launcherFragment"
-            app:destination="@id/launcherFragment" />
+            app:destination="@id/launcherFragment"
+            app:popUpTo="@id/launcherFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_out_left"
+            app:exitAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_out_right"
+            app:popExitAnim="@anim/slide_in_left"/>
     </fragment>
+
     <fragment
         android:id="@+id/firebaseAuthFragment"
         android:name="com.example.spotifyclone.framework.presentation.ui.auth.FirebaseAuthFragment"
-        android:label="FirebaseAuthFragment" >
+        android:label="FirebaseAuthFragment">
         <action
             android:id="@+id/action_firebaseAuthFragment_to_spotifyTokenFragment"
-            app:destination="@id/spotifyTokenFragment" />
+            app:destination="@id/spotifyTokenFragment"
+            app:popUpTo="@id/firebaseAuthFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/action_firebaseAuthFragment_to_launcherFragment"
-            app:destination="@id/launcherFragment" />
+            app:destination="@id/launcherFragment"
+            app:popUpTo="@id/launcherFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_out_left"
+            app:exitAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_out_right"
+            app:popExitAnim="@anim/slide_in_left"/>
     </fragment>
+
     <fragment
         android:id="@+id/spotifyTokenFragment"
         android:name="com.example.spotifyclone.framework.presentation.ui.auth.SpotifyTokenFragment"
-        android:label="SpotifyTokenFragment" >
+        android:label="SpotifyTokenFragment">
         <action
             android:id="@+id/action_spotifyTokenFragment_to_launcherFragment"
-            app:destination="@id/launcherFragment" />
+            app:destination="@id/launcherFragment"
+            app:popUpTo="@id/launcherFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/slide_out_left"
+            app:exitAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_out_right"
+            app:popExitAnim="@anim/slide_in_left"/>
     </fragment>
 </navigation>

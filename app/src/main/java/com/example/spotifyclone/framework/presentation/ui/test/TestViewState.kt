@@ -1,6 +1,8 @@
 package com.example.spotifyclone.framework.presentation.ui.test
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+
 data class TestViewState(
-    var one: Int? = 0,
-    var two: Int? = 0
+    var three: MutableState<Int?> = mutableStateOf(null)
 )

@@ -70,6 +70,4 @@ abstract class BaseActivity : AppCompatActivity(), UICommunicationListener {
     ) {
         TODO("Not yet implemented")
     }
-
-    abstract override fun displayProgressBar(isLoading: Boolean)
 }

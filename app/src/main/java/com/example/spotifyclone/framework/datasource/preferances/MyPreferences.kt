@@ -15,6 +15,15 @@ class MyPreferences
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val editor = prefs.edit()
 
+    fun saveSpotifyInstalled(isInstalled: Boolean) {
+        editor.putBoolean(SPOTIFY_INSTALLED, isInstalled)
+        editor.apply()
+    }
+
+    fun isSpotifyInstalled(): Boolean {
+        return prefs.getBoolean(SPOTIFY_INSTALLED, false)
+    }
+
     fun saveSpotifyToken(token: String?) {
         editor.putString(SPOTIFY_TOKEN, token)
         editor.apply()
@@ -25,6 +34,7 @@ class MyPreferences
     }
 
     companion object {
+        const val SPOTIFY_INSTALLED = "SPOTIFY_INSTALLED"
         const val SPOTIFY_TOKEN = "SPOTIFY_TOKEN"
     }
 }

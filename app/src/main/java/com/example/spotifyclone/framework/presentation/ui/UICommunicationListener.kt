@@ -10,5 +10,5 @@ interface UICommunicationListener {
         stateMessageCallback: StateMessageCallback
     )
 
-    fun displayProgressBar(isLoading: Boolean)
+    fun execute(event: String)
 }

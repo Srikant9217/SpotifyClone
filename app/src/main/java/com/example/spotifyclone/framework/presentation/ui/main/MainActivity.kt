@@ -3,10 +3,13 @@ package com.example.spotifyclone.framework.presentation.ui.main
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
-import androidx.lifecycle.Observer
 import com.example.spotifyclone.R
 import com.example.spotifyclone.framework.presentation.ui.BaseActivity
 import com.example.spotifyclone.framework.presentation.ui.auth.AuthActivity
+import com.example.spotifyclone.framework.presentation.ui.main.home.HomeFragment.Companion.NULL_TOKEN
+import com.example.spotifyclone.framework.presentation.ui.main.home.HomeFragment.Companion.NULL_USER
+import com.example.spotifyclone.util.printLogD
+import com.firebase.ui.auth.AuthUI
 import dagger.hilt.android.AndroidEntryPoint
 
 //Show logo at same position from previous Activity, disable activity Animation
@@ -22,8 +25,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         restoreSession(savedInstanceState)
         subscribeObservers()
@@ -40,25 +43,59 @@ class MainActivity : BaseActivity() {
         outState.putString(AUTH_TOKEN_BUNDLE_KEY, sessionManager.spotifyToken.value)
     }
 
-    private fun subscribeObservers(){
-        sessionManager.spotifyToken.observe(this, Observer{ token ->
-            if(token == null){
+    override fun execute(event: String) {
+        when (event) {
+            NULL_USER -> {
+                firebaseSignOut()
+            }
+            NULL_TOKEN -> {
+                clearSpotifyToken()
+            }
+        }
+    }
+
+    private fun subscribeObservers() {
+        sessionManager.firebaseUser.observe(this, { firebaseUser ->
+            if (firebaseUser == null) {
+                navAuthActivity()
+            }
+        })
+
+        sessionManager.spotifyToken.observe(this, { spotifyToken ->
+            if (spotifyToken == null) {
                 navAuthActivity()
             }
         })
     }
 
-    private fun navAuthActivity(){
+    private fun firebaseSignOut() {
+        AuthUI.getInstance()
+            .signOut(this)
+            .addOnSuccessListener {
+                sessionManager.setFirebaseUser(null)
+            }
+            .addOnFailureListener { error ->
+                printLogD(
+                    "MainActivity",
+                    "firebaseSignOut : " +
+                            "\n Error message : ${error.message}" +
+                            "\n Error cause : ${error.cause}"
+                )
+            }
+    }
+
+    private fun clearSpotifyToken() {
+        sessionManager.setSpotifyToken(null)
+    }
+
+    private fun navAuthActivity() {
+        printLogD("MainActivity", "navAuthActivity : Navigating to AuthActivity")
         val intent = Intent(this, AuthActivity::class.java)
         startActivity(intent)
         finish()
     }
 
-    override fun displayProgressBar(isLoading: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    companion object{
+    companion object {
         const val AUTH_TOKEN_BUNDLE_KEY = "AUTH_TOKEN_BUNDLE_KEY"
     }
 }

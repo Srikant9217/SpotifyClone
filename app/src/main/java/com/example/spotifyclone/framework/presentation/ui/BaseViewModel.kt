@@ -1,5 +1,7 @@
 package com.example.spotifyclone.framework.presentation.ui
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,18 +11,7 @@ import kotlinx.coroutines.flow.flow
 
 abstract class BaseViewModel<ViewState> : ViewModel() {
 
-    private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
-
-    val viewState: LiveData<ViewState>
-        get() = _viewState
-
-    fun setViewState(viewState: ViewState) {
-        _viewState.value = viewState
-    }
-
-    fun getCurrentViewStateOrNew(): ViewState {
-        return viewState.value ?: initNewViewState()
-    }
+    val viewState: MutableState<ViewState> by lazy { mutableStateOf(initNewViewState()) }
 
     abstract fun initNewViewState(): ViewState
 
@@ -32,7 +23,7 @@ abstract class BaseViewModel<ViewState> : ViewModel() {
             }
         }
 
-    val shouldDisplayProgressBar: LiveData<Boolean> = dataChannelManager.shouldDisplayProgressBar
+    val shouldDisplayProgressBar = dataChannelManager.shouldDisplayProgressBar
 
     abstract fun handleNewData(data: ViewState)
 
@@ -76,8 +67,7 @@ abstract class BaseViewModel<ViewState> : ViewModel() {
 
 
     // MessageStack Functions
-    val stateMessage: LiveData<StateMessage?>
-        get() = dataChannelManager.messageStack.stateMessage
+    val stateMessage = dataChannelManager.messageStack.stateMessage
 
     fun removeStateMessage(index: Int = 0) = dataChannelManager.removeStateMessage(index)
 

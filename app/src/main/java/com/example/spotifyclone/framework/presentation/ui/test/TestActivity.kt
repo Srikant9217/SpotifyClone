@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +29,11 @@ class TestActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        subscribeObservers()
         setContent {
-            SpotifyCloneTheme {
+            SpotifyCloneTheme(
+                displayProgressBar = false,
+                displayLogo = false,
+            ) {
 
                 val logo = remember { mutableStateOf(false) }
 
@@ -41,18 +44,13 @@ class TestActivity : BaseActivity() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    Button(onClick = { viewModel.setOne() }) {
-                        Text(text = "set 1")
-                    }
-                    Button(onClick = { viewModel.setTwo() }) {
-                        Text(text = "set 2")
-                    }
+                    Text(
+                        text = viewModel.getThree().value.toString(),
+                        color = MaterialTheme.colors.onBackground
+                    )
 
-                    Button(onClick = { viewModel.viewState.value?.one =+ 1 }) {
-                        Text(text = "direct 1")
-                    }
-                    Button(onClick = { viewModel.viewState.value?.two =+ 1 }) {
-                        Text(text = "direct 2")
+                    Button(onClick = { viewModel.setThree() }) {
+                        Text(text = "set 3")
                     }
 
                     Button(onClick = { logo.value = true }) {
@@ -69,21 +67,7 @@ class TestActivity : BaseActivity() {
         }
     }
 
-    private fun subscribeObservers() {
-        viewModel.viewState.observe(this, Observer { ViewState ->
-            ViewState?.let { viewState ->
-
-                viewState.one?.let {
-                    printLogD("subscribeObservers", it.toString())
-                }
-                viewState.two?.let {
-                    printLogD("subscribeObservers", it.toString())
-                }
-            }
-        })
-    }
-
-    override fun displayProgressBar(isLoading: Boolean) {
+    override fun execute(event: String) {
         TODO("Not yet implemented")
     }
 }

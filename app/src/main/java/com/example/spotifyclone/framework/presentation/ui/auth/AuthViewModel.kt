@@ -1,22 +1,60 @@
 package com.example.spotifyclone.framework.presentation.ui.auth
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.example.spotifyclone.business.domain.state.*
+import com.example.spotifyclone.framework.datasource.session.SessionManager
 import com.example.spotifyclone.framework.presentation.ui.BaseViewModel
-import com.example.spotifyclone.framework.presentation.ui.auth.state.AuthStateEvent.*
 import com.example.spotifyclone.framework.presentation.ui.auth.state.AuthViewState
+import com.example.spotifyclone.util.printLogD
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AuthViewModel : BaseViewModel<AuthViewState>() {
+@HiltViewModel
+class AuthViewModel
+@Inject
+constructor(
+    val sessionManager: SessionManager
+) : BaseViewModel<AuthViewState>() {
 
-    val splashLogo = mutableStateOf(true)
+    //null -> not triggered
+    //false -> failed
+    //true -> successful
+    val spotifyInstallEvent: MutableState<Boolean?> = mutableStateOf(null)
+    val firebaseAuthEvent: MutableState<Boolean?> = mutableStateOf(null)
+    val spotifyTokenEvent: MutableState<Boolean?> = mutableStateOf(null)
 
-    val spotifyNotInstalledDialog = mutableStateOf(false)
-
+    // Dialogs
+    val spotifyInstallDialog = mutableStateOf(false)
     val firebaseErrorDialog = mutableStateOf(false)
-    val firebaseErrorMessage = mutableStateOf("")
-
     val spotifyTokenDialog = mutableStateOf(false)
+
+    // Dialog Messages
+    val firebaseErrorMessage = mutableStateOf("")
     val spotifyTokenErrorMessage = mutableStateOf("")
+
+    val splashLogo = mutableStateOf(false)
+    val progressBar = mutableStateOf(false)
+
+    fun hideLogo() {
+        splashLogo.value = false
+        printLogD("AuthViewModel", "hideLogo : hideLogo called")
+    }
+
+    fun showLogo() {
+        splashLogo.value = true
+        printLogD("AuthViewModel", "showLogo : showLogo called")
+    }
+
+    fun hideProgressBar() {
+        progressBar.value = false
+        printLogD("AuthViewModel", "hideProgressBar : hideProgressBar called")
+    }
+
+    fun showProgressBar() {
+        progressBar.value = true
+        printLogD("AuthViewModel", "showProgressBar : showProgressBar called")
+    }
 
     fun showFirebaseErrorDialog(message: String) {
         firebaseErrorMessage.value = message
@@ -28,59 +66,12 @@ class AuthViewModel : BaseViewModel<AuthViewState>() {
         spotifyTokenDialog.value = true
     }
 
-
     override fun initNewViewState(): AuthViewState {
         return AuthViewState()
     }
 
     override fun setStateEvent(stateEvent: StateEvent) {
-        when (stateEvent) {
-            is CheckSpotifyPackage -> {
-                checkSpotifyPackageEvent()
-            }
-            is StartFirebaseAuthentication -> {
-                startFirebaseAuthenticationEvent()
-            }
-            is GetSpotifyToken -> {
-                getSpotifyTokenEvent()
-            }
-        }
-    }
-
-    private fun checkSpotifyPackageEvent() {
-        val update = getCurrentViewStateOrNew()
-        update.event.checkSpotifyPackage = false
-        setViewState(update)
-    }
-
-    fun finishCheckSpotifyPackage(done: Boolean) {
-        val update = getCurrentViewStateOrNew()
-        update.event.checkSpotifyPackage = done
-        setViewState(update)
-    }
-
-    private fun startFirebaseAuthenticationEvent() {
-        val update = getCurrentViewStateOrNew()
-        update.event.startFirebaseAuthentication = false
-        setViewState(update)
-    }
-
-    fun finishFirebaseAuthentication(done: Boolean) {
-        val update = getCurrentViewStateOrNew()
-        update.event.startFirebaseAuthentication = done
-        setViewState(update)
-    }
-
-    private fun getSpotifyTokenEvent() {
-        val update = getCurrentViewStateOrNew()
-        update.event.getSpotifyToken = false
-        setViewState(update)
-    }
-
-    fun finishSpotifyTokenEvent(done: Boolean) {
-        val update = getCurrentViewStateOrNew()
-        update.event.getSpotifyToken = done
-        setViewState(update)
+        // Nothing
     }
 
     override fun handleNewData(data: AuthViewState) {

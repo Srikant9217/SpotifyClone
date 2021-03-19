@@ -11,22 +11,27 @@ fun SpotifyNotInstalledDialog(
     isDisplayed: Boolean,
     showDialog: (Boolean) -> Unit,
     downloadSpotify: () -> Unit,
-    retry: () -> Unit
+    backToLauncher: () -> Unit
 ) {
     MyDialog(
         isDisplayed = isDisplayed,
-        title = "Could not detect Spotify",
-        text = "Please Download Spotify",
+        text = "Please Download Spotify from playStore",
         confirmButton = {
-            Button(onClick = {
-                showDialog(false)
-                downloadSpotify()
-            }) {
+            Button(
+                onClick = {
+                    showDialog(false)
+                    downloadSpotify()
+                }
+            ) {
                 Text(text = "Get Spotify Free")
             }
         },
-        onDismissRequest = { },
-        retry = { retry() })
+        dismissButton = { },
+        onDismissRequest = {
+            backToLauncher()
+            printLogD("Components", "SpotifyNotInstalledDialog : backToLauncher called")
+        }
+    )
 }
 
 @Composable
@@ -34,22 +39,27 @@ fun FirebaseErrorDialog(
     isDisplayed: Boolean,
     text: String,
     showDialog: (Boolean) -> Unit,
-    retry: () -> Unit
+    backToLauncher: () -> Unit
 ) {
     MyDialog(
         isDisplayed = isDisplayed,
-        title = "Error",
         text = text,
         confirmButton = {
-            Button(onClick = {
-                showDialog(false)
-                printLogD("FirebaseErrorDialog", "Retry")
-            }) {
+            Button(
+                onClick = {
+                    showDialog(false)
+                    backToLauncher()
+                }
+            ) {
                 Text(text = "Retry")
             }
         },
-        onDismissRequest = { retry() },
-        retry = { retry() })
+        dismissButton = { },
+        onDismissRequest = {
+            backToLauncher()
+            printLogD("Components", "FirebaseErrorDialog : backToLauncher called")
+        }
+    )
 }
 
 @Composable
@@ -57,43 +67,42 @@ fun SpotifyTokenErrorDialog(
     isDisplayed: Boolean,
     text: String,
     showDialog: (Boolean) -> Unit,
-    retry: () -> Unit
+    backToLauncher: () -> Unit
 ) {
     MyDialog(
         isDisplayed = isDisplayed,
-        title = "Error",
         text = text,
         confirmButton = {
-            Button(onClick = {
-                showDialog(false)
-                printLogD("SpotifyTokenErrorDialog", "Retry")
-            }) {
+            Button(
+                onClick = {
+                    showDialog(false)
+                    backToLauncher()
+                }
+            ) {
                 Text(text = "Retry")
             }
         },
-        onDismissRequest = { retry() },
-        retry = { retry() })
+        dismissButton = { },
+        onDismissRequest = {
+            backToLauncher()
+            printLogD("Components", "SpotifyTokenErrorDialog : backToLauncher called")
+        }
+    )
 }
 
 @Composable
 fun MyDialog(
     isDisplayed: Boolean,
-    title: String,
     text: String,
     confirmButton: @Composable () -> Unit,
-    onDismissRequest: () -> Unit,
-    retry: () -> Unit
+    dismissButton: @Composable () -> Unit,
+    onDismissRequest: () -> Unit
 ) {
     if (isDisplayed) {
         AlertDialog(
-            title = { Text(text = title) },
             text = { Text(text = text) },
             confirmButton = { confirmButton() },
-            dismissButton = {
-                Button(onClick = { retry() }) {
-                    Text(text = "Dismiss")
-                }
-            },
+            dismissButton = { dismissButton() },
             onDismissRequest = { onDismissRequest() }
         )
     }

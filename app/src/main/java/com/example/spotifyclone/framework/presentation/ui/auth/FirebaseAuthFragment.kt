@@ -8,21 +8,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import com.example.spotifyclone.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import com.example.spotifyclone.framework.presentation.components.FirebaseErrorDialog
 import com.example.spotifyclone.framework.presentation.components.MyButton
 import com.example.spotifyclone.framework.presentation.theme.SpotifyCloneTheme
+import com.example.spotifyclone.framework.presentation.ui.BaseFragment
+import com.example.spotifyclone.util.printLogD
 
-class FirebaseAuthFragment : Fragment() {
+class FirebaseAuthFragment : BaseFragment() {
 
     val viewModel: AuthViewModel by activityViewModels()
 
@@ -31,25 +32,42 @@ class FirebaseAuthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        subscribeObservers()
         return ComposeView(requireContext()).apply {
             setContent {
-                SpotifyCloneTheme {
+                SpotifyCloneTheme(
+                    displayProgressBar = viewModel.progressBar.value,
+                    displayLogo = viewModel.splashLogo.value,
+                ) {
 
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(bottom = 50.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Bottom
+                        verticalArrangement = Arrangement.spacedBy(
+                            10.dp,
+                            Alignment.CenterVertically
+                        )
                     ) {
-                        Text(text = "Welcome")
+                        Text(
+                            text = "FirebaseAuthFragment",
+                            color = MaterialTheme.colors.onBackground
+                        )
 
                         MyButton(
-                            isDisplayed = true,
+                            isDisplayed = viewModel.firebaseAuthEvent.value == null,
+                            text = "Login",
+                            onClick = {
+                                uiCommunicationListener.execute(START_FIREBASE_AUTHENTICATION_EVENT)
+                            }
+                        )
+
+                        MyButton(
+                            isDisplayed = viewModel.firebaseAuthEvent.value == true,
                             text = "Next",
                             onClick = {
-                                findNavController()
-                                    .navigate(R.id.action_firebaseAuthFragment_to_spotifyTokenFragment)
+                                findNavController().navigate(R.id.action_firebaseAuthFragment_to_spotifyTokenFragment)
                             }
                         )
                     }
@@ -58,14 +76,25 @@ class FirebaseAuthFragment : Fragment() {
                         isDisplayed = viewModel.firebaseErrorDialog.value,
                         text = viewModel.firebaseErrorMessage.value,
                         showDialog = { viewModel.firebaseErrorDialog.value = it },
-                        retry = {
-                            findNavController()
-                                .navigate(R.id.action_spotifyInstallFragment_to_launcherFragment)
+                        backToLauncher = {
+                            findNavController().navigate(R.id.action_firebaseAuthFragment_to_launcherFragment)
                         }
                     )
 
                 }
             }
         }
+    }
+
+    private fun subscribeObservers() {
+        viewModel.sessionManager.firebaseUser.observe(viewLifecycleOwner, { FirebaseUser ->
+            FirebaseUser?.let {
+                viewModel.firebaseAuthEvent.value = true
+            }
+        })
+    }
+
+    companion object {
+        const val START_FIREBASE_AUTHENTICATION_EVENT = "START_FIREBASE_AUTHENTICATION_EVENT"
     }
 }

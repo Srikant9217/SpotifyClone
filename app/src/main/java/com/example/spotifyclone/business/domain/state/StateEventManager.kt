@@ -1,5 +1,6 @@
 package com.example.spotifyclone.business.domain.state
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.spotifyclone.util.printLogD
@@ -12,11 +13,7 @@ import com.example.spotifyclone.util.printLogD
 class StateEventManager {
 
     private val activeStateEvents: HashMap<String, StateEvent> = HashMap()
-    private val _shouldDisplayProgressBar: MutableLiveData<Boolean> = MutableLiveData()
-
-    val shouldDisplayProgressBar: LiveData<Boolean>
-        get() = _shouldDisplayProgressBar
-
+    val shouldDisplayProgressBar = mutableStateOf(false)
 
     fun isStateEventActive(stateEvent: StateEvent): Boolean {
         printLogD(
@@ -52,13 +49,13 @@ class StateEventManager {
     }
 
     private fun syncNumActiveStateEvents() {
-        var shouldDisplayProgressBar = false
+        var progressBar = false
         for (stateEvent in activeStateEvents.values) {
             if (stateEvent.shouldDisplayProgressBar()) {
-                shouldDisplayProgressBar = true
+                progressBar = true
             }
         }
-        _shouldDisplayProgressBar.value = shouldDisplayProgressBar
-        printLogD("StateEventManager", "ProgressBar $shouldDisplayProgressBar ")
+        shouldDisplayProgressBar.value = progressBar
+        printLogD("StateEventManager", "ProgressBar $progressBar ")
     }
 }
